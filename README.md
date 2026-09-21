@@ -118,6 +118,52 @@ Currently supported tags are:
 
 ## Usage
 
+### Running against a THP Docker stack
+
+The standalone runner executes the **Connect**, **Basis Patient Read**, and
+**Patient Update/Delete Cancellation** selections (39 scenarios in the current
+suite). It requires Python 3.10+, Java 21, Maven, and a running, seeded THP box:
+
+```sh
+python3 scripts/run_thp_tests.py
+```
+
+The default endpoint is `http://localhost:8080`, with Keycloak at `/auth`, realm
+`thp`, and the box's demo credentials. The runner discovers the FHIR links of
+`patient-1`, `patient-2`, and `practitioner-1`; obtain a seeded box by completing its
+`fhir-init` setup first. No archived reports, old tokens, fixed resource IDs, pip
+packages, or other Python scripts are needed.
+
+The runner creates temporary Keycloak clients, obtains fresh tokens with the exact
+Connect scopes, and creates disposable Basis patients. It removes its clients and
+patients afterward, including after test failures; seeded users and their resources
+are not changed. Missing read scopes are created temporarily and removed afterward;
+existing scopes are preserved. Use `--require-existing-scopes` to prohibit scope
+creation, or `--keep-fixtures` to retain created patients for debugging.
+
+```sh
+# Another local port
+python3 scripts/run_thp_tests.py --base-url http://localhost:8090
+# Only one selection
+python3 scripts/run_thp_tests.py --tests patient-read
+# Optionally start a box using its Compose file and existing project name
+python3 scripts/run_thp_tests.py --compose-file /path/to/docker-compose.yml --compose-project secured
+```
+
+Override passwords through `THP_ADMIN_PASSWORD` (default `admin`),
+`THP_SYSTEM_CLIENT_SECRET`, `THP_PATIENT_PASSWORD`, and `THP_PRACTITIONER_PASSWORD`
+(default `password`). `--help` lists endpoint, identity, timeout, and output options.
+The script runs on macOS/Linux and defaults to Tiger **4.4.3**, matching the verified
+THP execution; change it with `--tiger-version` if needed.
+
+Every invocation writes a new `.test-reports/thp/<run-id>/index.html`, with totals
+from Maven Failsafe, links to each native Tiger/Serenity report, logs, configuration,
+and `summary.json`. Report files include HTTP authentication tokens and are created
+with private permissions. Later selections continue after test failures. Exit codes
+are **0** for success, **1** for test failures/errors, **2** for setup/build/cleanup
+problems, and **130** for interruption. The verified local THP baseline has four
+Connect failures, so exit 1 is expected until those behaviors change.
+
 ### Using Maven
 
 You can run the test suite by defining the specification level and the tests to run using the `TESTS_TO_RUN` property.
