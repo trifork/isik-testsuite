@@ -2,6 +2,36 @@
 
 # Release Notes
 
+## Release 3.0.9
+
+### changed
+
+- Updated Tiger Framework to 4.4.5
+
+## Release 3.0.8
+
+### fixed
+
+- Entrypoint in the Docker Image, due to changes in the upstream one.
+
+## Release 3.0.7
+
+### fixed
+
+- Missing runtime dependency for Serenity Reports (`jackson-annotations`)
+
+## Release 3.0.6
+
+### changed
+
+- Updated Tiger Framework to 4.4.4
+
+## Release 3.0.5
+
+### changed
+
+- Updated Tiger Framework to 4.4.3
+
 ## Release 3.0.4
 
 ### changed
